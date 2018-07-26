@@ -896,7 +896,7 @@ namespace OfficeDevPnP.Core.Framework.Provisioning.ObjectHandlers
             return field;
         }
 
-        private Field UpdateField(ClientObject web, ListInfo listInfo, Guid fieldId, XElement templateFieldElement, Field existingField, PnPMonitoredScope scope, TokenParser parser, string originalFieldXml)
+        private Field UpdateField(Web web, ListInfo listInfo, Guid fieldId, XElement templateFieldElement, Field existingField, PnPMonitoredScope scope, TokenParser parser, string originalFieldXml)
         {
             Field field = null;
             web.Context.Load(existingField, f => f.SchemaXmlWithResourceTokens);
@@ -948,7 +948,9 @@ namespace OfficeDevPnP.Core.Framework.Provisioning.ObjectHandlers
                         {
                             existingFieldElement.Attributes("Version").Remove();
                         }
-                        existingField.SchemaXml = parser.ParseXmlString(existingFieldElement.ToString(), "~sitecollection", "~site");
+
+                        var existingFieldXml = FieldUtilities.FixLookupField(existingFieldElement.ToString(), web);
+                        existingField.SchemaXml = parser.ParseXmlString(existingFieldXml, "~sitecollection", "~site");
                         existingField.UpdateAndPushChanges(true);
                         web.Context.ExecuteQueryRetry();
 #if !SP2013
